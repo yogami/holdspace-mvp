@@ -153,6 +153,14 @@ export default function ReviewPage() {
                             >
                                 Skip for now
                             </button>
+
+                            <Link
+                                href={`/session/${healerId}/safety-report`}
+                                className="safety-link"
+                                style={{ display: "flex", justifyContent: "center", marginTop: "var(--space-md)" }}
+                            >
+                                🛡️ Report a safety concern
+                            </Link>
                         </form>
                     </div>
                 </div>

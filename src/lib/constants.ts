@@ -55,6 +55,17 @@ export interface Healer {
     avgRating: number;
     totalReviews: number;
     totalSessions: number;
+    // Trust & Safety extensions
+    trustScore: number;              // 0–100 composite
+    trustTier: 'new' | 'verified' | 'established' | 'trusted';
+    identityVerified: boolean;
+    credentialsVerified: boolean;
+    backgroundCheck: boolean;
+    cancellationRate: number;        // 0–1
+    responseTimeMinutes: number;
+    accountCreatedAt: string;        // ISO date
+    activeSessionId: string | null;  // null = available
+    lastLocationUpdate: string | null;
 }
 
 export interface Review {

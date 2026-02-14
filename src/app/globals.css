@@ -1264,3 +1264,196 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Trust Badge ---------- */
+.trust-badge--compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--badge-color) 12%, transparent);
+  color: var(--badge-color);
+  white-space: nowrap;
+}
+
+.trust-badge--full {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: white;
+  border: 1px solid var(--linen);
+  border-left: 3px solid var(--badge-color);
+}
+
+.trust-badge__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.trust-badge__icon {
+  font-size: 1.1rem;
+}
+
+.trust-badge__tier {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+}
+
+.trust-badge__score {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--badge-color);
+}
+
+.trust-badge__checks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trust-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.82rem;
+}
+
+.trust-check__icon {
+  font-size: 0.85rem;
+  width: 16px;
+  text-align: center;
+}
+
+.trust-check--passed .trust-check__icon {
+  color: var(--sage-deep);
+}
+
+.trust-check--passed .trust-check__label {
+  color: var(--charcoal);
+}
+
+.trust-check--pending .trust-check__icon {
+  color: var(--clay-light);
+}
+
+.trust-check--pending .trust-check__label {
+  color: var(--charcoal-soft);
+  opacity: 0.6;
+}
+
+/* ---------- SOS Button ---------- */
+.sos-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  border: 2px solid rgba(231, 76, 60, 0.4);
+  border-radius: var(--radius-full);
+  background: rgba(231, 76, 60, 0.1);
+  color: #E74C3C;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sos-button:hover {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: rgba(231, 76, 60, 0.6);
+}
+
+.sos-button--confirming {
+  background: #E74C3C;
+  color: white;
+  border-color: #E74C3C;
+  animation: sos-pulse 1s ease-in-out infinite;
+}
+
+.sos-button__icon {
+  font-size: 1rem;
+}
+
+.sos-triggered {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sos-triggered__icon {
+  font-size: 1rem;
+}
+
+@keyframes sos-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(231, 76, 60, 0);
+  }
+}
+
+/* ---------- Session Safety Bar ---------- */
+.session-safety {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* ---------- Busy Indicator (Healer Card) ---------- */
+.healer-card--busy {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.healer-card--busy::after {
+  content: 'In Session';
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(231, 76, 60, 0.9);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ---------- Safety Link ---------- */
+.safety-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--charcoal-soft);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  padding: var(--space-sm) 0;
+}
+
+.safety-link:hover {
+  color: #E74C3C;
+  opacity: 1;
+}

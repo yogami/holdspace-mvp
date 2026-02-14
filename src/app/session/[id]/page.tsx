@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { SEED_HEALERS } from "@/lib/seed-data";
+import { SOSButton } from "@/components/sos-button";
 
 export default function SessionPage() {
     const params = useParams();
@@ -57,6 +58,10 @@ export default function SessionPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-lg)" }}>
                     <div className="session-timer">{formatTime(elapsed)}</div>
+                    <SOSButton onTrigger={() => {
+                        setSessionActive(false);
+                        router.push(`/session/${healerId}/review?sos=true`);
+                    }} />
                     <button className="btn--end" onClick={handleEndSession}>
                         End Session
                     </button>
