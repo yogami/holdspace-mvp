@@ -1,0 +1,216 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { MODALITIES, LANGUAGES, type Modality } from "@/lib/constants";
+import { SEED_HEALERS } from "@/lib/seed-data";
+
+export default function HealersPage() {
+    const [search, setSearch] = useState("");
+    const [selectedModalities, setSelectedModalities] = useState<Modality[]>([]);
+    const [selectedLanguage, setSelectedLanguage] = useState("");
+    const [maxPrice, setMaxPrice] = useState(200);
+    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+
+    const toggleModality = (id: Modality) => {
+        setSelectedModalities(prev =>
+            prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+        );
+    };
+
+    const filteredHealers = useMemo(() => {
+        let result = [...SEED_HEALERS];
+
+        // Search
+        if (search) {
+            const q = search.toLowerCase();
+            result = result.filter(h =>
+                h.fullName.toLowerCase().includes(q) ||
+                h.bio.toLowerCase().includes(q)
+            );
+        }
+
+        // Modalities
+        if (selectedModalities.length > 0) {
+            result = result.filter(h =>
+                selectedModalities.some(m => h.modalities.includes(m))
+            );
+        }
+
+        // Language
+        if (selectedLanguage) {
+            result = result.filter(h => h.languages.includes(selectedLanguage));
+        }
+
+        // Price
+        result = result.filter(h => h.hourlyRate <= maxPrice);
+
+        // Online only
+        if (showOnlineOnly) {
+            result = result.filter(h => h.availabilityStatus === "online");
+        }
+
+        // Sort: online first, then available_soon, then offline
+        const statusOrder = { online: 0, available_soon: 1, offline: 2 };
+        result.sort((a, b) => statusOrder[a.availabilityStatus] - statusOrder[b.availabilityStatus]);
+
+        return result;
+    }, [search, selectedModalities, selectedLanguage, maxPrice, showOnlineOnly]);
+
+    return (
+        <>
+            <nav className="nav">
+                <Link href="/" className="nav__logo">
+                    <span className="nav__logo-icon">🌿</span>
+                    HoldSpace
+                </Link>
+                <ul className="nav__links">
+                    <li><Link href="/healers">Find a Healer</Link></li>
+                    <li><Link href="/#waitlist" className="btn btn--primary btn--sm">Join Waitlist</Link></li>
+                </ul>
+            </nav>
+
+            <main className="section" style={{ paddingTop: "var(--space-xl)" }}>
+                <div className="container">
+                    <div className="animate-in" style={{ marginBottom: "var(--space-xl)" }}>
+                        <h1 style={{ marginBottom: "var(--space-sm)" }}>Find your healer</h1>
+                        <p>Browse available facilitators and book a session when you&apos;re ready.</p>
+                    </div>
+
+                    {/* Filter Bar */}
+                    <div className="filter-bar animate-in animate-in-delay-1">
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                            <input
+                                type="search"
+                                placeholder="Search by name or keyword..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)", flex: 1 }}>
+                            <label className="text-sm" style={{ fontWeight: 600 }}>Modality</label>
+                            <div className="filter-pills">
+                                {MODALITIES.map(mod => (
+                                    <button
+                                        key={mod.id}
+                                        className={`filter-pill ${selectedModalities.includes(mod.id) ? "filter-pill--active" : ""}`}
+                                        onClick={() => toggleModality(mod.id)}
+                                    >
+                                        {mod.icon} {mod.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: "var(--space-md)", flexWrap: "wrap", alignItems: "end" }}>
+                            <div className="input-group" style={{ minWidth: 140 }}>
+                                <label>Language</label>
+                                <select
+                                    value={selectedLanguage}
+                                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                                >
+                                    <option value="">All languages</option>
+                                    {LANGUAGES.map(lang => (
+                                        <option key={lang} value={lang}>{lang}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="input-group" style={{ minWidth: 160 }}>
+                                <label>Max price: ${maxPrice}/hr</label>
+                                <input
+                                    type="range"
+                                    min={30}
+                                    max={200}
+                                    step={5}
+                                    value={maxPrice}
+                                    onChange={(e) => setMaxPrice(Number(e.target.value))}
+                                    style={{ padding: "8px 0" }}
+                                />
+                            </div>
+
+                            <button
+                                className={`filter-pill ${showOnlineOnly ? "filter-pill--active" : ""}`}
+                                onClick={() => setShowOnlineOnly(!showOnlineOnly)}
+                                style={{ height: "fit-content" }}
+                            >
+                                🟢 Online now
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Results count */}
+                    <p className="text-sm text-muted animate-in animate-in-delay-2" style={{ marginBottom: "var(--space-lg)" }}>
+                        {filteredHealers.length} healer{filteredHealers.length !== 1 ? "s" : ""} found
+                    </p>
+
+                    {/* Healer Grid */}
+                    <div className="healer-grid">
+                        {filteredHealers.map(healer => (
+                            <Link
+                                href={`/healers/${healer.id}`}
+                                key={healer.id}
+                                className="healer-card animate-in"
+                            >
+                                <img
+                                    className="healer-card__image"
+                                    src={healer.avatarUrl}
+                                    alt={healer.fullName}
+                                    loading="lazy"
+                                />
+                                <div className="healer-card__body">
+                                    <div className="healer-card__header">
+                                        <div>
+                                            <div className="healer-card__name">
+                                                {healer.fullName}
+                                                {healer.isVerified && <span title="Verified" style={{ marginLeft: 6 }}>✓</span>}
+                                            </div>
+                                            <div className="healer-card__modalities">
+                                                {healer.modalities.map(m => {
+                                                    const mod = MODALITIES.find(mod => mod.id === m);
+                                                    return (
+                                                        <span key={m} className="badge badge--sage">
+                                                            {mod?.icon} {mod?.label}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        <div className={`availability availability--${healer.availabilityStatus}`}>
+                                            <span className="availability__dot"></span>
+                                        </div>
+                                    </div>
+                                    <p className="healer-card__bio">{healer.bio}</p>
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "var(--space-sm) 0" }}>
+                                        {healer.languages.map(lang => (
+                                            <span key={lang} className="badge badge--clay">{lang}</span>
+                                        ))}
+                                    </div>
+                                    <div className="healer-card__footer">
+                                        <div className="rating-summary">
+                                            <span className="stars">★</span>
+                                            <span className="rating-number">{healer.avgRating}</span>
+                                            <span className="text-sm text-muted">({healer.totalReviews} reviews)</span>
+                                        </div>
+                                        <div className="healer-card__price">
+                                            ${healer.hourlyRate}<span>/hr</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {filteredHealers.length === 0 && (
+                        <div style={{ textAlign: "center", padding: "var(--space-3xl) 0" }}>
+                            <p style={{ fontSize: "1.5rem", marginBottom: "var(--space-md)" }}>🌿</p>
+                            <h3>No healers match your filters</h3>
+                            <p>Try adjusting your search or broadening your modality selection.</p>
+                        </div>
+                    )}
+                </div>
+            </main>
+        </>
+    );
+}
