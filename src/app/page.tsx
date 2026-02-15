@@ -15,6 +15,7 @@ function Nav() {
       <ul className="nav__links">
         <li><Link href="/healers">Find a Healer</Link></li>
         <li><Link href="#how-it-works">How It Works</Link></li>
+        <li><Link href="/onboarding">For Healers</Link></li>
         <li><Link href="#waitlist" className="btn btn--primary btn--sm">Join Waitlist</Link></li>
       </ul>
     </nav>
@@ -292,6 +293,12 @@ function Footer() {
               A marketplace for wellness facilitation — not healthcare.
             </p>
             <p className="footer__disclaimer">
+              HoldSpace ist keine medizinische Plattform. Unsere Begleiter:innen bieten
+              Wellness-Fazilitation an — keine Heilbehandlung, Therapie oder Diagnose.
+              Wenn Sie sich in einer Krise befinden, kontaktieren Sie bitte die
+              Telefonseelsorge (0800 111 0 111) oder den Notruf (112).
+            </p>
+            <p className="footer__disclaimer">
               HoldSpace connects seekers with independent wellness facilitators.
               Our services are not a substitute for medical care, therapy, or
               professional mental health treatment. If you&apos;re in crisis, please
@@ -309,8 +316,8 @@ function Footer() {
           <div>
             <h4>For Healers</h4>
             <ul>
-              <li><a href="#waitlist">Apply to Join</a></li>
-              <li><a href="#">Healer Guidelines</a></li>
+              <li><Link href="/onboarding">Apply to Join</Link></li>
+              <li><Link href="/dashboard">Healer Dashboard</Link></li>
               <li><a href="#">Community</a></li>
             </ul>
           </div>

@@ -66,6 +66,7 @@ export interface Healer {
     accountCreatedAt: string;        // ISO date
     activeSessionId: string | null;  // null = available
     lastLocationUpdate: string | null;
+    practitionerType: 'heilpraktiker' | 'wellness-practitioner' | 'unclassified';
 }
 
 export interface Review {

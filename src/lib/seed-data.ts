@@ -28,6 +28,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2024-06-15",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'wellness-practitioner',
     },
     {
         id: "h-kai-tanaka",
@@ -55,6 +56,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2023-11-01",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'heilpraktiker',
     },
     {
         id: "h-elena-rios",
@@ -82,6 +84,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2025-01-10",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'wellness-practitioner',
     },
     {
         id: "h-maya-osei",
@@ -109,6 +112,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2024-03-20",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'wellness-practitioner',
     },
     {
         id: "h-ravi-sharma",
@@ -136,6 +140,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2023-05-01",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'heilpraktiker',
     },
     {
         id: "h-lena-berg",
@@ -163,6 +168,7 @@ export const SEED_HEALERS: Healer[] = [
         accountCreatedAt: "2025-06-01",
         activeSessionId: null,
         lastLocationUpdate: null,
+        practitionerType: 'wellness-practitioner',
     },
 ];
 
