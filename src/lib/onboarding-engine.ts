@@ -50,7 +50,7 @@ function validateLegal(app: HealerApplication): StepValidationResult {
     const hasHP = app.legal.type === 'heilpraktiker' && !!app.legal.hpLicenseNumber;
     const hasDisclaimer = app.legal.type === 'wellness-practitioner' && app.legal.disclaimerAccepted;
     if (!hasHP && !hasDisclaimer) {
-        errors.push('You must either provide an HP license or accept the non-clinical disclaimer');
+        errors.push('Please provide an HP license number or confirm the wellness practitioner agreement');
     }
     return { valid: errors.length === 0, errors };
 }
@@ -133,5 +133,5 @@ export function generateDisclaimerText(
 
     return locale === 'de'
         ? 'Dieser Anbieter ist kein Heilpraktiker und bietet keine medizinische Behandlung an. Die angebotenen Leistungen dienen der Entspannung und dem Wohlbefinden.'
-        : 'This practitioner is not a licensed healthcare provider. The services offered are not medical treatment and are intended for relaxation and well-being.';
+        : 'This practitioner offers holistic wellness facilitation for personal growth and well-being. Sessions are not intended as a substitute for professional medical or psychological services.';
 }

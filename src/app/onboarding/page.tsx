@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MODALITIES, LANGUAGES } from "@/lib/constants";
 import {
@@ -33,7 +34,7 @@ function emptyApplication(): HealerApplication {
         modalities: [],
         credentials: [],
         legal: { type: "none", hpLicenseNumber: null, disclaimerAccepted: false },
-        social: { instagramHandle: null, websiteUrl: null },
+        social: { instagramHandle: null, websiteUrl: null, meetingUrl: null },
     };
 }
 
@@ -65,7 +66,7 @@ function ProfileStep({ app, onUpdate }: { app: HealerApplication; onUpdate: (a: 
                 />
                 {!bioFlags.clean && (
                     <div className="onboarding-warning">
-                        ⚠️ Flagged terms: <strong>{bioFlags.flagged.join(", ")}</strong>. As a wellness facilitator, please use non-clinical language.
+                        ⚠️ Flagged terms: <strong>{bioFlags.flagged.join(", ")}</strong>. As a holistic wellness facilitator, please avoid language that implies medical or psychological services.
                     </div>
                 )}
             </div>
@@ -194,7 +195,7 @@ function LegalStep({ app, onUpdate }: { app: HealerApplication; onUpdate: (a: He
                 >
                     <span className="legal-option__icon">🌿</span>
                     <span className="legal-option__title">Wellness Facilitator</span>
-                    <span className="legal-option__desc">I offer non-clinical wellness services</span>
+                    <span className="legal-option__desc">I offer holistic wellness facilitation</span>
                 </button>
             </div>
 
@@ -256,6 +257,19 @@ function SocialStep({ app, onUpdate }: { app: HealerApplication; onUpdate: (a: H
                     onChange={(e) => onUpdate({ ...app, social: { ...app.social, websiteUrl: e.target.value || null } })}
                 />
             </div>
+            <div className="input-group">
+                <label htmlFor="meetingUrl">Session Link <span className="text-sm text-muted">(Zoom, Google Meet, or Jitsi)</span></label>
+                <input
+                    id="meetingUrl"
+                    type="text"
+                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                    value={app.social.meetingUrl || ""}
+                    onChange={(e) => onUpdate({ ...app, social: { ...app.social, meetingUrl: e.target.value || null } })}
+                />
+                <p className="text-sm text-muted" style={{ marginTop: "var(--space-xs)" }}>
+                    Seekers will receive this link when they book a session with you.
+                </p>
+            </div>
         </div>
     );
 }
@@ -315,9 +329,33 @@ const STEP_COMPONENTS: Record<OnboardingStep, React.ComponentType<{ app: HealerA
 // ─── Main Page ───────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
+    const router = useRouter();
     const [stepIndex, setStepIndex] = useState(0);
     const [app, setApp] = useState<HealerApplication>(emptyApplication());
     const [submitted, setSubmitted] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState("");
+
+    // Pre-populate from existing profile
+    useEffect(() => {
+        fetch("/api/healers/profile")
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data && data.fullName) {
+                    setApp(prev => ({
+                        ...prev,
+                        profile: {
+                            fullName: data.fullName || prev.profile.fullName,
+                            bio: data.bio || prev.profile.bio,
+                            languages: data.languages?.length ? data.languages : prev.profile.languages,
+                            avatarUrl: data.avatarUrl || prev.profile.avatarUrl,
+                        },
+                        modalities: data.modalities?.length ? data.modalities : prev.modalities,
+                    }));
+                }
+            })
+            .catch(() => { }); // Not signed in yet — that's fine
+    }, []);
 
     const currentStep = ONBOARDING_STEPS[stepIndex];
     const meta = STEP_META[currentStep];
@@ -333,8 +371,35 @@ export default function OnboardingPage() {
         if (stepIndex > 0) setStepIndex(stepIndex - 1);
     };
 
-    const handleSubmit = () => {
-        setSubmitted(true);
+    const handleSubmit = async () => {
+        setSaving(true);
+        setSaveError("");
+        try {
+            const practitionerType = classifyPractitioner(app);
+            const res = await fetch("/api/healers/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: app.profile.fullName,
+                    bio: app.profile.bio,
+                    languages: app.profile.languages,
+                    avatarUrl: app.profile.avatarUrl,
+                    modalities: app.modalities,
+                    certifications: app.credentials.map(c => `${c.name} (${c.issuer}, ${c.year})`),
+                    practitionerType,
+                    meetingUrl: app.social.meetingUrl,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Failed to save profile");
+            }
+            setSubmitted(true);
+        } catch (err: unknown) {
+            setSaveError(err instanceof Error ? err.message : "Something went wrong");
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (submitted) {
@@ -349,8 +414,10 @@ export default function OnboardingPage() {
                 <div className="onboarding-success">
                     <div className="onboarding-success__icon">🌿</div>
                     <h2>Welcome to HoldSpace</h2>
-                    <p>Your application has been received. We&apos;ll review it and get back to you within 48 hours.</p>
-                    <Link href="/" className="btn btn--primary">Return Home</Link>
+                    <p>Your profile is live! Head to your dashboard to manage your practice.</p>
+                    <button type="button" className="btn btn--primary" onClick={() => router.push("/dashboard")}>
+                        Go to Dashboard →
+                    </button>
                 </div>
             </div>
         );
@@ -419,14 +486,17 @@ export default function OnboardingPage() {
                         )}
                         <div style={{ flex: 1 }} />
                         {currentStep === "review" ? (
-                            <button
-                                type="button"
-                                className="btn btn--primary btn--lg"
-                                onClick={handleSubmit}
-                                disabled={!validateStep(app, "review").valid}
-                            >
-                                Submit Application ✨
-                            </button>
+                            <>
+                                {saveError && <div className="onboarding-error" style={{ marginRight: "auto" }}>⚠ {saveError}</div>}
+                                <button
+                                    type="button"
+                                    className="btn btn--primary btn--lg"
+                                    onClick={handleSubmit}
+                                    disabled={!validateStep(app, "review").valid || saving}
+                                >
+                                    {saving ? "Saving..." : "Save & Launch Profile ✨"}
+                                </button>
+                            </>
                         ) : (
                             <button
                                 type="button"

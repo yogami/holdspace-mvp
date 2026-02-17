@@ -1,9 +1,8 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { MODALITIES } from "@/lib/constants";
-import { SEED_HEALERS } from "@/lib/seed-data";
+import { MODALITIES, type Healer } from "@/lib/constants";
+import { getOnlineCount, getFeaturedHealers } from "@/lib/data";
+import { TrustBadge } from "@/components/trust-badge";
+import WaitlistForm from "@/components/waitlist-form";
 
 function Nav() {
   return (
@@ -22,8 +21,7 @@ function Nav() {
   );
 }
 
-function HeroSection() {
-  const onlineCount = SEED_HEALERS.filter(h => h.availabilityStatus === "online").length;
+function HeroSection({ onlineCount }: { onlineCount: number }) {
 
   return (
     <section className="hero">
@@ -127,7 +125,7 @@ function Modalities() {
         <div style={{ textAlign: "center", marginBottom: "var(--space-2xl)" }}>
           <h2 className="animate-in">What kind of support are you looking for?</h2>
           <p className="animate-in animate-in-delay-1" style={{ margin: "var(--space-md) auto 0", textAlign: "center" }}>
-            Our healers specialize in a range of modalities. All are non-clinical wellness practices.
+            Our practitioners offer a range of holistic wellness modalities to support your journey.
           </p>
         </div>
         <div className="modality-grid">
@@ -149,8 +147,7 @@ function Modalities() {
   );
 }
 
-function FeaturedHealers() {
-  const featured = SEED_HEALERS.filter(h => h.availabilityStatus === "online").slice(0, 3);
+function FeaturedHealers({ featured }: { featured: Healer[] }) {
 
   return (
     <section className="section section--alt">
@@ -218,20 +215,55 @@ function FeaturedHealers() {
   );
 }
 
-function WaitlistSection() {
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<string>("seeker");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubmitted(true);
-    }
-  };
-
+function ForHealersSection() {
   return (
-    <section className="section" id="waitlist">
+    <section className="section">
+      <div className="container">
+        <div style={{ textAlign: "center", marginBottom: "var(--space-2xl)" }}>
+          <h2 className="animate-in">✨ For healers, by healers</h2>
+          <p className="animate-in animate-in-delay-1" style={{ margin: "var(--space-md) auto 0", maxWidth: "600px", textAlign: "center" }}>
+            HoldSpace is built for independent practitioners who want to reach people
+            in their moment of need — without the overhead.
+          </p>
+        </div>
+        <div className="healer-value-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "var(--space-lg)" }}>
+          <div className="card animate-in" style={{ textAlign: "center", padding: "var(--space-xl)" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>💰</div>
+            <h3 style={{ marginBottom: "var(--space-sm)" }}>Set your own rates</h3>
+            <p className="text-muted">You decide what your time is worth. No platform fees during early access.</p>
+          </div>
+          <div className="card animate-in animate-in-delay-1" style={{ textAlign: "center", padding: "var(--space-xl)" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>📅</div>
+            <h3 style={{ marginBottom: "var(--space-sm)" }}>Your clients, your schedule</h3>
+            <p className="text-muted">Toggle online when you&apos;re available. Seekers find you instantly — no back-and-forth.</p>
+          </div>
+          <div className="card animate-in animate-in-delay-2" style={{ textAlign: "center", padding: "var(--space-xl)" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>🟢</div>
+            <h3 style={{ marginBottom: "var(--space-sm)" }}>Real-time availability</h3>
+            <p className="text-muted">Your profile lights up when you&apos;re ready. Seekers see who&apos;s available right now.</p>
+          </div>
+          <div className="card animate-in animate-in-delay-3" style={{ textAlign: "center", padding: "var(--space-xl)" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "var(--space-md)" }}>🛡️</div>
+            <h3 style={{ marginBottom: "var(--space-sm)" }}>Trust &amp; safety built in</h3>
+            <p className="text-muted">Trust scores, verified credentials, and safety reporting protect you and your clients.</p>
+          </div>
+        </div>
+        <div style={{ textAlign: "center", marginTop: "var(--space-2xl)" }}>
+          <Link href="/register" className="btn btn--primary btn--lg">
+            Join as a healer →
+          </Link>
+          <p className="text-sm text-muted" style={{ marginTop: "var(--space-md)" }}>
+            Early access — no fees, no commitment.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WaitlistSection() {
+  return (
+    <section className="section section--alt" id="waitlist">
       <div className="container">
         <div className="cta-section">
           <h2 className="animate-in">Be the first to know</h2>
@@ -239,42 +271,7 @@ function WaitlistSection() {
             HoldSpace is launching soon. Join the waitlist to get early access — whether you&apos;re
             seeking support or offering it.
           </p>
-          {!submitted ? (
-            <div className="animate-in animate-in-delay-2">
-              <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-md)", marginBottom: "var(--space-lg)" }}>
-                <button
-                  className={`filter-pill ${role === "seeker" ? "filter-pill--active" : ""}`}
-                  onClick={() => setRole("seeker")}
-                  style={{ borderColor: role === "seeker" ? "white" : "rgba(255,255,255,0.3)", color: "white", background: role === "seeker" ? "rgba(255,255,255,0.2)" : "transparent" }}
-                >
-                  🙏 I&apos;m seeking
-                </button>
-                <button
-                  className={`filter-pill ${role === "healer" ? "filter-pill--active" : ""}`}
-                  onClick={() => setRole("healer")}
-                  style={{ borderColor: role === "healer" ? "white" : "rgba(255,255,255,0.3)", color: "white", background: role === "healer" ? "rgba(255,255,255,0.2)" : "transparent" }}
-                >
-                  ✨ I&apos;m a healer
-                </button>
-              </div>
-              <form className="waitlist-form" onSubmit={handleSubmit}>
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button type="submit" className="btn btn--primary">
-                  Join Waitlist
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className="waitlist-success animate-in" style={{ justifyContent: "center", color: "white" }}>
-              <span>🌿</span> You&apos;re on the list! We&apos;ll be in touch soon.
-            </div>
-          )}
+          <WaitlistForm />
         </div>
       </div>
     </section>
@@ -290,19 +287,18 @@ function Footer() {
             <h4>🌿 HoldSpace</h4>
             <p>
               Warm, human connection when you need it most.
-              A marketplace for wellness facilitation — not healthcare.
+              A marketplace for holistic wellness facilitation.
             </p>
             <p className="footer__disclaimer">
               HoldSpace ist keine medizinische Plattform. Unsere Begleiter:innen bieten
-              Wellness-Fazilitation an — keine Heilbehandlung, Therapie oder Diagnose.
-              Wenn Sie sich in einer Krise befinden, kontaktieren Sie bitte die
-              Telefonseelsorge (0800 111 0 111) oder den Notruf (112).
+              ganzheitliche Wellness-Begleitung an — keine Heilbehandlung oder Diagnose.
+              Bei akuter Krise: Telefonseelsorge (0800 111 0 111) oder Notruf (112).
             </p>
             <p className="footer__disclaimer">
-              HoldSpace connects seekers with independent wellness facilitators.
-              Our services are not a substitute for medical care, therapy, or
-              professional mental health treatment. If you&apos;re in crisis, please
-              contact the 988 Suicide &amp; Crisis Lifeline or your local emergency services.
+              HoldSpace connects seekers with independent holistic wellness facilitators.
+              Sessions are for personal growth, relaxation, and well-being — not a replacement
+              for professional medical or psychological services.
+              If you&apos;re in crisis, please contact 988 Lifeline or your local emergency services.
             </p>
           </div>
           <div>
@@ -340,16 +336,22 @@ function Footer() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const [onlineCount, featured] = await Promise.all([
+    getOnlineCount(),
+    getFeaturedHealers(3),
+  ]);
+
   return (
     <>
       <Nav />
       <main>
-        <HeroSection />
+        <HeroSection onlineCount={onlineCount} />
         <TrustBar />
         <HowItWorks />
         <Modalities />
-        <FeaturedHealers />
+        <FeaturedHealers featured={featured} />
+        <ForHealersSection />
         <WaitlistSection />
       </main>
       <Footer />

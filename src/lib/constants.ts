@@ -67,6 +67,7 @@ export interface Healer {
     activeSessionId: string | null;  // null = available
     lastLocationUpdate: string | null;
     practitionerType: 'heilpraktiker' | 'wellness-practitioner' | 'unclassified';
+    meetingUrl: string | null;
 }
 
 export interface Review {

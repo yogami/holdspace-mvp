@@ -1457,3 +1457,110 @@ textarea::placeholder {
   color: #E74C3C;
   opacity: 1;
 }
+
+/* ─── Auth Pages (Login / Register) ──────────────────────────────── */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--sage-deep) 0%, var(--cream) 100%);
+  padding: var(--space-lg);
+}
+
+.auth-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-logo {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--sage-deep);
+  text-decoration: none;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.auth-header h1 {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--charcoal);
+  margin: 0 0 var(--space-xs);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-form label span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.auth-form input {
+  padding: var(--space-sm) var(--space-md);
+  border: 1.5px solid var(--cream-dark, #d4c5a9);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  transition: border-color var(--transition-fast);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(var(--sage-rgb, 143, 171, 143), 0.15);
+}
+
+.auth-submit {
+  margin-top: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 1rem;
+}
+
+.auth-error {
+  background: #FFF5F5;
+  color: #C53030;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  border: 1px solid #FED7D7;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--charcoal-soft);
+}
+
+.auth-footer a {
+  color: var(--sage-deep);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}

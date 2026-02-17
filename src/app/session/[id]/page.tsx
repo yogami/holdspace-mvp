@@ -3,17 +3,28 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { SEED_HEALERS } from "@/lib/seed-data";
 import { SOSButton } from "@/components/sos-button";
+import type { Healer } from "@/lib/constants";
 
 export default function SessionPage() {
     const params = useParams();
     const router = useRouter();
     const healerId = params.id as string;
-    const healer = SEED_HEALERS.find(h => h.id === healerId);
+    const [healer, setHealer] = useState<Healer | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const [elapsed, setElapsed] = useState(0);
     const [sessionActive, setSessionActive] = useState(true);
+
+    useEffect(() => {
+        fetch(`/api/healers?q=${encodeURIComponent(healerId)}`)
+            .then(res => res.json())
+            .then(data => {
+                const match = data.find((h: Healer) => h.id === healerId);
+                setHealer(match || null);
+            })
+            .finally(() => setLoading(false));
+    }, [healerId]);
 
     useEffect(() => {
         if (!sessionActive) return;
@@ -33,6 +44,14 @@ export default function SessionPage() {
         setSessionActive(false);
         router.push(`/session/${healerId}/review`);
     };
+
+    if (loading) {
+        return (
+            <div className="container section" style={{ textAlign: "center" }}>
+                <p>Loading session...</p>
+            </div>
+        );
+    }
 
     if (!healer) {
         return (

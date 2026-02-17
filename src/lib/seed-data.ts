@@ -29,6 +29,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'wellness-practitioner',
+        meetingUrl: null,
     },
     {
         id: "h-kai-tanaka",
@@ -36,7 +37,7 @@ export const SEED_HEALERS: Healer[] = [
         avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
         bio: "Reiki master and sound healer. I create a cocoon of vibration and warmth where your nervous system can finally let go. Sessions blend crystal bowls, energy work, and guided meditation.",
         modalities: ["energy-healing", "sound-healing", "meditation"],
-        certifications: ["Usui Reiki Master", "Crystal Bowl Sound Therapy"],
+        certifications: ["Usui Reiki Master", "Crystal Bowl Sound Healing"],
         languages: ["English", "Japanese"],
         hourlyRate: 95,
         currency: "USD",
@@ -57,6 +58,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'heilpraktiker',
+        meetingUrl: null,
     },
     {
         id: "h-elena-rios",
@@ -85,6 +87,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'wellness-practitioner',
+        meetingUrl: null,
     },
     {
         id: "h-maya-osei",
@@ -113,6 +116,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'wellness-practitioner',
+        meetingUrl: null,
     },
     {
         id: "h-ravi-sharma",
@@ -141,6 +145,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'heilpraktiker',
+        meetingUrl: null,
     },
     {
         id: "h-lena-berg",
@@ -169,6 +174,7 @@ export const SEED_HEALERS: Healer[] = [
         activeSessionId: null,
         lastLocationUpdate: null,
         practitionerType: 'wellness-practitioner',
+        meetingUrl: null,
     },
 ];
 
@@ -265,7 +271,7 @@ export const SEED_REVIEWS: Record<string, Review[]> = {
             id: "r12",
             seekerName: "Sofia G.",
             rating: 5,
-            comment: "I booked a session expecting to talk. Instead, Lena sang and played bowls and I processed more in 60 minutes than in 6 months of traditional therapy.",
+            comment: "I booked a session expecting to talk. Instead, Lena sang and played bowls and I processed more in 60 minutes than I have in a long time.",
             createdAt: "2026-01-30",
         },
     ],

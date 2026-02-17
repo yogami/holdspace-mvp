@@ -40,6 +40,7 @@ export interface LegalSection {
 export interface SocialSection {
     instagramHandle: string | null;
     websiteUrl: string | null;
+    meetingUrl: string | null;
 }
 
 export interface HealerApplication {

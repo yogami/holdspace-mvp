@@ -1,19 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { SEED_HEALERS } from "@/lib/seed-data";
+import type { Healer } from "@/lib/constants";
 
 export default function ReviewPage() {
     const params = useParams();
     const healerId = params.id as string;
-    const healer = SEED_HEALERS.find(h => h.id === healerId);
+    const [healer, setHealer] = useState<Healer | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        fetch(`/api/healers?q=${encodeURIComponent(healerId)}`)
+            .then(res => res.json())
+            .then(data => {
+                const match = data.find((h: Healer) => h.id === healerId);
+                setHealer(match || null);
+            })
+            .finally(() => setLoading(false));
+    }, [healerId]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (rating === 0) return;
+
+        setSubmitting(true);
+        setError("");
+        try {
+            const res = await fetch("/api/reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    healerSlug: healerId,
+                    rating,
+                    comment,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Failed to submit review");
+            }
+            setSubmitted(true);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Something went wrong");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="container section" style={{ textAlign: "center" }}>
+                <p>Loading...</p>
+            </div>
+        );
+    }
 
     if (!healer) {
         return (
@@ -25,13 +74,6 @@ export default function ReviewPage() {
             </div>
         );
     }
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (rating > 0) {
-            setSubmitted(true);
-        }
-    };
 
     if (submitted) {
         return (
@@ -136,13 +178,19 @@ export default function ReviewPage() {
                                 rows={4}
                             />
 
+                            {error && (
+                                <p style={{ color: "var(--terracotta)", textAlign: "center", marginBottom: "var(--space-sm)" }}>
+                                    {error}
+                                </p>
+                            )}
+
                             <button
                                 type="submit"
                                 className="btn btn--primary"
                                 style={{ width: "100%", marginTop: "var(--space-md)" }}
-                                disabled={rating === 0}
+                                disabled={rating === 0 || submitting}
                             >
-                                Submit reflection
+                                {submitting ? "Submitting..." : "Submit reflection"}
                             </button>
 
                             <button

@@ -1,42 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MODALITIES } from "@/lib/constants";
-import { SEED_HEALERS } from "@/lib/seed-data";
+import { MODALITIES, type Healer } from "@/lib/constants";
 import { computeProgress, createProgram, enrollSeeker } from "@/lib/program-engine";
 import type { Program, ProgramConfig } from "@/lib/program-types";
 import "./dashboard.css";
 
-// ─── Mock Data ──────────────────────────────────────────────────────────
-
-const MOCK_HEALER = SEED_HEALERS[0];
 const COMPLETENESS = 78;
-
-const UPCOMING_SESSIONS = [
-    { id: "s-001", seekerName: "Anonymous Seeker", modality: "breathwork", date: "Feb 16, 2026", time: "10:00", duration: 60, status: "confirmed" as const },
-    { id: "s-002", seekerName: "Anonymous Seeker", modality: "somatic", date: "Feb 17, 2026", time: "14:30", duration: 90, status: "pending" as const },
-];
-
-const RECENT_SESSIONS = [
-    { id: "s-003", seekerName: "Anonymous Seeker", modality: "breathwork", date: "Feb 14, 2026", duration: 60, status: "completed" as const, rating: 5 },
-    { id: "s-004", seekerName: "Anonymous Seeker", modality: "meditation", date: "Feb 12, 2026", duration: 30, status: "completed" as const, rating: 4 },
-    { id: "s-005", seekerName: "Anonymous Seeker", modality: "energy-healing", date: "Feb 10, 2026", duration: 60, status: "cancelled" as const, rating: null },
-];
-
-const SAMPLE_PROGRAMS: Program[] = [
-    createProgram(MOCK_HEALER.id, {
-        title: "Breathwork Foundations",
-        description: "A 3-session journey into conscious breathing.",
-        modality: "breathwork",
-        sessionCount: 3,
-        milestones: [
-            { stepNumber: 1, title: "Grounding", description: "Baseline connection", intentionPrompt: "What does safety feel like?", integrationPrompt: "What did you notice?" },
-            { stepNumber: 2, title: "Deepening", description: "Expand capacity", intentionPrompt: "What will you release?", integrationPrompt: "What surfaced?" },
-            { stepNumber: 3, title: "Integration", description: "Daily life anchoring", intentionPrompt: "How will you carry this?", integrationPrompt: "What shifted?" },
-        ],
-    }),
-];
 
 // ─── Components ─────────────────────────────────────────────────────────
 
@@ -55,7 +26,7 @@ function DashboardNav() {
     );
 }
 
-function OverviewCards() {
+function OverviewCards({ healer }: { healer: Healer }) {
     const trustTierEmoji: Record<string, string> = {
         new: "🌱", verified: "✅", established: "⚡", trusted: "💎",
     };
@@ -64,31 +35,47 @@ function OverviewCards() {
         <div className="dashboard-cards">
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-card__icon">📅</span>
-                <div className="dashboard-stat-card__value">{UPCOMING_SESSIONS.length}</div>
-                <div className="dashboard-stat-card__label">Upcoming Sessions</div>
+                <div className="dashboard-stat-card__value">{healer.totalSessions}</div>
+                <div className="dashboard-stat-card__label">Total Sessions</div>
             </div>
             <div className="dashboard-stat-card">
-                <span className="dashboard-stat-card__icon">{trustTierEmoji[MOCK_HEALER.trustTier]}</span>
-                <div className="dashboard-stat-card__value">{MOCK_HEALER.trustScore}</div>
+                <span className="dashboard-stat-card__icon">{trustTierEmoji[healer.trustTier]}</span>
+                <div className="dashboard-stat-card__value">{healer.trustScore}</div>
                 <div className="dashboard-stat-card__label">Trust Score</div>
-                <div className="dashboard-stat-card__sub badge badge--sage">{MOCK_HEALER.trustTier}</div>
+                <div className="dashboard-stat-card__sub badge badge--sage">{healer.trustTier}</div>
             </div>
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-card__icon">📊</span>
-                <div className="dashboard-stat-card__value">{MOCK_HEALER.totalSessions}</div>
+                <div className="dashboard-stat-card__value">{healer.totalSessions}</div>
                 <div className="dashboard-stat-card__label">Total Sessions</div>
             </div>
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-card__icon">⭐</span>
-                <div className="dashboard-stat-card__value">{MOCK_HEALER.avgRating}</div>
-                <div className="dashboard-stat-card__label">Avg Rating ({MOCK_HEALER.totalReviews} reviews)</div>
+                <div className="dashboard-stat-card__value">{healer.avgRating}</div>
+                <div className="dashboard-stat-card__label">Avg Rating ({healer.totalReviews} reviews)</div>
             </div>
         </div>
     );
 }
 
-function AvailabilityToggle() {
-    const [status, setStatus] = useState<"online" | "offline">("online");
+function AvailabilityToggle({ initialStatus }: { initialStatus: "online" | "offline" }) {
+    const [status, setStatus] = useState<"online" | "offline">(initialStatus);
+    const [toggling, setToggling] = useState(false);
+
+    const toggle = async () => {
+        const newStatus = status === "online" ? "offline" : "online";
+        setToggling(true);
+        try {
+            const res = await fetch("/api/healers/availability", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if (res.ok) setStatus(newStatus);
+        } catch { } finally {
+            setToggling(false);
+        }
+    };
 
     return (
         <div className="dashboard-availability">
@@ -99,15 +86,38 @@ function AvailabilityToggle() {
             <button
                 type="button"
                 className={`btn ${status === "online" ? "btn--sage btn--sm" : "btn--secondary btn--sm"}`}
-                onClick={() => setStatus(status === "online" ? "offline" : "online")}
+                onClick={toggle}
+                disabled={toggling}
             >
-                {status === "online" ? "Go Offline" : "Go Online"}
+                {toggling ? "..." : status === "online" ? "Go Offline" : "Go Online"}
             </button>
         </div>
     );
 }
 
+interface SessionRow {
+    id: string;
+    modality: string | null;
+    duration: number | null;
+    scheduledDate: string | null;
+    scheduledTime: string | null;
+    status: string | null;
+    rating: number | null;
+    seekerName: string | null;
+}
+
 function SessionList() {
+    const [sessions, setSessions] = useState<SessionRow[]>([]);
+    const [loadingSessions, setLoadingSessions] = useState(true);
+
+    useEffect(() => {
+        fetch("/api/sessions")
+            .then(res => res.ok ? res.json() : [])
+            .then(data => setSessions(data))
+            .catch(() => [])
+            .finally(() => setLoadingSessions(false));
+    }, []);
+
     const statusStyle: Record<string, string> = {
         confirmed: "badge--sage",
         pending: "badge--gold",
@@ -115,46 +125,72 @@ function SessionList() {
         cancelled: "badge--terracotta",
     };
 
+    const upcoming = sessions.filter(s => s.status === "confirmed" || s.status === "pending");
+    const recent = sessions.filter(s => s.status === "completed" || s.status === "cancelled");
+
+    if (loadingSessions) {
+        return (
+            <div className="dashboard-section">
+                <h3>📅 Sessions</h3>
+                <p className="text-muted">Loading sessions...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="dashboard-section">
             <h3>📅 Upcoming Sessions</h3>
-            <div className="dashboard-session-list">
-                {UPCOMING_SESSIONS.map((s) => {
-                    const mod = MODALITIES.find((m) => m.id === s.modality);
-                    return (
-                        <div key={s.id} className="dashboard-session-item">
-                            <div className="dashboard-session-item__icon">{mod?.icon}</div>
-                            <div className="dashboard-session-item__details">
-                                <div className="dashboard-session-item__title">{mod?.label} — {s.duration}min</div>
-                                <div className="dashboard-session-item__meta text-sm text-muted">{s.date} at {s.time}</div>
+            {upcoming.length === 0 ? (
+                <p className="text-muted" style={{ padding: "var(--space-md) 0" }}>No upcoming sessions yet. Share your profile to get booked!</p>
+            ) : (
+                <div className="dashboard-session-list">
+                    {upcoming.map((s) => {
+                        const mod = MODALITIES.find((m) => m.id === s.modality);
+                        return (
+                            <div key={s.id} className="dashboard-session-item">
+                                <div className="dashboard-session-item__icon">{mod?.icon || "📅"}</div>
+                                <div className="dashboard-session-item__details">
+                                    <div className="dashboard-session-item__title">{mod?.label || s.modality} — {s.duration || 60}min</div>
+                                    <div className="dashboard-session-item__meta text-sm text-muted">
+                                        {s.scheduledDate ? new Date(s.scheduledDate).toLocaleDateString() : "TBD"}
+                                        {s.scheduledTime ? ` at ${s.scheduledTime}` : ""}
+                                    </div>
+                                </div>
+                                <span className={`badge ${statusStyle[s.status || "pending"]}`}>{s.status}</span>
                             </div>
-                            <span className={`badge ${statusStyle[s.status]}`}>{s.status}</span>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             <h3 style={{ marginTop: "var(--space-xl)" }}>📋 Recent Sessions</h3>
-            <div className="dashboard-session-list">
-                {RECENT_SESSIONS.map((s) => {
-                    const mod = MODALITIES.find((m) => m.id === s.modality);
-                    return (
-                        <div key={s.id} className="dashboard-session-item">
-                            <div className="dashboard-session-item__icon">{mod?.icon}</div>
-                            <div className="dashboard-session-item__details">
-                                <div className="dashboard-session-item__title">{mod?.label} — {s.duration}min</div>
-                                <div className="dashboard-session-item__meta text-sm text-muted">{s.date} {s.rating ? `★ ${s.rating}` : ""}</div>
+            {recent.length === 0 ? (
+                <p className="text-muted" style={{ padding: "var(--space-md) 0" }}>No completed sessions yet.</p>
+            ) : (
+                <div className="dashboard-session-list">
+                    {recent.map((s) => {
+                        const mod = MODALITIES.find((m) => m.id === s.modality);
+                        return (
+                            <div key={s.id} className="dashboard-session-item">
+                                <div className="dashboard-session-item__icon">{mod?.icon || "📅"}</div>
+                                <div className="dashboard-session-item__details">
+                                    <div className="dashboard-session-item__title">{mod?.label || s.modality} — {s.duration || 60}min</div>
+                                    <div className="dashboard-session-item__meta text-sm text-muted">
+                                        {s.scheduledDate ? new Date(s.scheduledDate).toLocaleDateString() : ""}
+                                        {s.rating ? ` ★ ${s.rating}` : ""}
+                                    </div>
+                                </div>
+                                <span className={`badge ${statusStyle[s.status || "completed"]}`}>{s.status}</span>
                             </div>
-                            <span className={`badge ${statusStyle[s.status]}`}>{s.status}</span>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }
 
-function ProgramsSection() {
+function ProgramsSection({ programs }: { programs: Program[] }) {
     const [showBuilder, setShowBuilder] = useState(false);
 
     return (
@@ -166,7 +202,7 @@ function ProgramsSection() {
                 </button>
             </div>
 
-            {SAMPLE_PROGRAMS.map((prog) => (
+            {programs.map((prog) => (
                 <div key={prog.id} className="program-card">
                     <div className="program-card__header">
                         <h4>{prog.title}</h4>
@@ -234,24 +270,94 @@ function ProfileCompletenessCard() {
 // ─── Main Page ───────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+    const [healer, setHealer] = useState<Healer | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch("/api/healers/profile")
+            .then(res => {
+                if (!res.ok) throw new Error("Not authenticated");
+                return res.json();
+            })
+            .then(data => setHealer(data))
+            .catch(() => setHealer(null))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="dashboard-layout">
+                <DashboardNav />
+                <div className="dashboard-container" style={{ textAlign: "center", padding: "var(--space-3xl)" }}>
+                    <p>Loading your dashboard...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Fallback for unauthenticated or missing healer
+    const dashboardHealer: Healer = healer || {
+        id: "demo",
+        fullName: "Demo Healer",
+        avatarUrl: "",
+        bio: "",
+        modalities: [],
+        certifications: [],
+        languages: [],
+        hourlyRate: 0,
+        currency: "USD",
+        availabilityStatus: "offline",
+        isVerified: false,
+        yearsExperience: 0,
+        avgRating: 0,
+        totalReviews: 0,
+        totalSessions: 0,
+        trustScore: 0,
+        trustTier: "new",
+        identityVerified: false,
+        credentialsVerified: false,
+        backgroundCheck: false,
+        cancellationRate: 0,
+        responseTimeMinutes: 0,
+        accountCreatedAt: new Date().toISOString(),
+        activeSessionId: null,
+        lastLocationUpdate: null,
+        practitionerType: "unclassified",
+        meetingUrl: null,
+    };
+
+    const programs: Program[] = dashboardHealer.id !== "demo" ? [
+        createProgram(dashboardHealer.id, {
+            title: "Breathwork Foundations",
+            description: "A 3-session journey into conscious breathing.",
+            modality: "breathwork",
+            sessionCount: 3,
+            milestones: [
+                { stepNumber: 1, title: "Grounding", description: "Baseline connection", intentionPrompt: "What does safety feel like?", integrationPrompt: "What did you notice?" },
+                { stepNumber: 2, title: "Deepening", description: "Expand capacity", intentionPrompt: "What will you release?", integrationPrompt: "What surfaced?" },
+                { stepNumber: 3, title: "Integration", description: "Daily life anchoring", intentionPrompt: "How will you carry this?", integrationPrompt: "What shifted?" },
+            ],
+        }),
+    ] : [];
+
     return (
         <div className="dashboard-layout">
             <DashboardNav />
             <div className="dashboard-container">
                 <div className="dashboard-welcome animate-in">
                     <div>
-                        <h1>Welcome back, {MOCK_HEALER.fullName.split(" ")[0]} 🌿</h1>
+                        <h1>Welcome back, {dashboardHealer.fullName.split(" ")[0]} 🌿</h1>
                         <p className="text-muted">Here&apos;s your practice at a glance.</p>
                     </div>
-                    <AvailabilityToggle />
+                    <AvailabilityToggle initialStatus={(dashboardHealer.availabilityStatus === "online" ? "online" : "offline")} />
                 </div>
 
-                <OverviewCards />
+                <OverviewCards healer={dashboardHealer} />
 
                 <div className="dashboard-grid">
                     <div className="dashboard-main">
                         <SessionList />
-                        <ProgramsSection />
+                        <ProgramsSection programs={programs} />
                     </div>
                     <div className="dashboard-sidebar">
                         <ProfileCompletenessCard />
