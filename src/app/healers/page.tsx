@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { getHealers } from "@/lib/data";
 import HealerGrid from "@/components/healer-grid";
+export const dynamic = "force-dynamic";
 
 export default async function HealersPage() {
     const healers = await getHealers();

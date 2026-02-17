@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getHealerBySlug, getReviewsBySlug } from "@/lib/data";
 import HealerProfileClient from "@/components/healer-profile-client";
+export const dynamic = "force-dynamic";
 
 export default async function HealerProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MODALITIES, type Healer } from "@/lib/constants";
 import { getOnlineCount, getFeaturedHealers } from "@/lib/data";
+export const dynamic = "force-dynamic";
 import { TrustBadge } from "@/components/trust-badge";
 import WaitlistForm from "@/components/waitlist-form";
 
