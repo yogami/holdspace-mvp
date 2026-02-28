@@ -61,6 +61,16 @@
   --transition-breath: 3s ease-in-out infinite;
 }
 
+@media (max-width: 768px) {
+  :root {
+    --space-2xl: 32px;
+    --space-3xl: 48px;
+    --space-4xl: 64px;
+    --space-lg: 16px;
+    --space-xl: 24px;
+  }
+}
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
@@ -164,6 +174,12 @@ p {
   padding: var(--space-4xl) 0;
 }
 
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-3xl) 0;
+  }
+}
+
 .section--alt {
   background: var(--warm-white);
 }
@@ -233,6 +249,23 @@ p {
 .btn--lg {
   padding: 18px 40px;
   font-size: 1.1rem;
+}
+
+/* Base flex-wrap for buttons */
+.hero__content div[style*="display: flex"] {
+  gap: var(--space-md) !important;
+}
+
+@media (max-width: 600px) {
+  .hero__content div[style*="display: flex"] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 /* ---------- Cards ---------- */
@@ -532,6 +565,19 @@ textarea::placeholder {
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .profile-hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .profile-avatar {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+  }
+}
+
 .profile-section {
   margin-top: var(--space-2xl);
 }
@@ -590,8 +636,14 @@ textarea::placeholder {
 /* ---------- Healer Grid ---------- */
 .healer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-xl);
+}
+
+@media (max-width: 600px) {
+  .healer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- Review Card ---------- */
@@ -781,6 +833,76 @@ textarea::placeholder {
   min-height: 120px;
   resize: vertical;
   margin-bottom: var(--space-lg);
+}
+
+/* ---------- Navigation ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: white;
+  border-bottom: 1px solid var(--linen);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  text-decoration: none;
+}
+
+.nav__logo-icon {
+  font-size: 1.5rem;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  list-style: none;
+}
+
+.nav__links a {
+  font-weight: 500;
+  color: var(--charcoal-soft);
+}
+
+.nav__links a:hover {
+  color: var(--terracotta);
+}
+
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .nav__links {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--linen);
+  }
+
+  .nav__links li {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav__links a.btn {
+    display: block;
+    width: 100%;
+  }
 }
 
 /* ---------- Waitlist Form ---------- */

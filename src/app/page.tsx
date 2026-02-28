@@ -13,9 +13,9 @@ function Nav() {
         HoldSpace
       </Link>
       <ul className="nav__links">
-        <li><Link href="/healers">Find a Healer</Link></li>
+        <li><Link href="/healers">Find Support</Link></li>
         <li><Link href="#how-it-works">How It Works</Link></li>
-        <li><Link href="/onboarding">For Healers</Link></li>
+        <li><Link href="/for-healers">For Healers</Link></li>
         <li><Link href="#waitlist" className="btn btn--primary btn--sm">Join Waitlist</Link></li>
       </ul>
     </nav>
@@ -33,17 +33,17 @@ function HeroSection({ onlineCount }: { onlineCount: number }) {
             <span>{onlineCount} healers available right now</span>
           </div>
           <h1>
-            Find your healer.<br />
+            A safe space to land.<br />
             <em>Right now.</em>
           </h1>
           <p>
-            When life gets heavy, you don&apos;t need to wait 3 weeks for an appointment.
+            When things feel heavy, you don&apos;t need to wait 3 weeks.
             Connect instantly with breathwork guides, energy workers, and somatic healers
-            who are online and ready to hold space for you.
+            who are online and holding space for you today.
           </p>
           <div style={{ display: "flex", gap: "var(--space-md)", flexWrap: "wrap" }}>
             <Link href="/healers" className="btn btn--primary btn--lg">
-              Browse Healers
+              Find Support
             </Link>
             <a href="#waitlist" className="btn btn--secondary btn--lg">
               Join the Waitlist
@@ -91,26 +91,23 @@ function HowItWorks() {
         <div className="steps">
           <div className="step animate-in animate-in-delay-1">
             <div className="step__number">1</div>
-            <h3>Browse &amp; choose</h3>
+            <h3>Discover your guide</h3>
             <p>
-              Filter by what you need — breathwork, energy healing, grief support.
-              See who&apos;s available right now with real-time status.
+              Explore modalities that speak to what you&apos;re carrying today—whether that&apos;s grief, anxiety, or simply needing grounding.
             </p>
           </div>
           <div className="step animate-in animate-in-delay-2">
             <div className="step__number">2</div>
-            <h3>Book instantly</h3>
+            <h3>Connect gently</h3>
             <p>
-              Choose your session length, pay securely, and get connected.
-              No forms, no intake questionnaires, no waiting.
+              Find a practitioner who is available right now. No intake forms, no waiting lists. Just connection.
             </p>
           </div>
           <div className="step animate-in animate-in-delay-3">
             <div className="step__number">3</div>
             <h3>Be held</h3>
             <p>
-              Join a private video session with your healer.
-              Breathe, release, and let someone hold space for you.
+              Join a private, secure video session. Breathe, release, and let someone hold space for your healing.
             </p>
           </div>
         </div>
@@ -305,7 +302,7 @@ function Footer() {
           <div>
             <h4>Explore</h4>
             <ul>
-              <li><Link href="/healers">Find a Healer</Link></li>
+              <li><Link href="/healers">Find Support</Link></li>
               <li><a href="#how-it-works">How It Works</a></li>
               <li><a href="#waitlist">Join Waitlist</a></li>
             </ul>
@@ -313,7 +310,7 @@ function Footer() {
           <div>
             <h4>For Healers</h4>
             <ul>
-              <li><Link href="/onboarding">Apply to Join</Link></li>
+              <li><Link href="/for-healers">Join as a Practitioner</Link></li>
               <li><Link href="/dashboard">Healer Dashboard</Link></li>
               <li><a href="#">Community</a></li>
             </ul>

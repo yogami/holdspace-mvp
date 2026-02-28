@@ -131,18 +131,20 @@ export default function HealerGrid({ initialHealers }: { initialHealers: Healer[
     return (
         <>
             {/* Filter Bar */}
-            <div className="filter-bar animate-in animate-in-delay-1">
-                <div style={{ flex: 1, minWidth: 200 }}>
+            <div className="filter-bar animate-in animate-in-delay-1" style={{ border: "none", background: "var(--warm-white)", padding: "var(--space-xl)" }}>
+                <div style={{ flex: 1, minWidth: 200, display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+                    <label className="text-sm" style={{ fontWeight: 600, color: "var(--charcoal)" }}>What are you looking for support with?</label>
                     <input
                         type="search"
-                        placeholder="Search by name or keyword..."
+                        placeholder="e.g., anxiety, grief, grounding..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        style={{ background: "white" }}
                     />
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)", flex: 1 }}>
-                    <label className="text-sm" style={{ fontWeight: 600 }}>Modality</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)", flex: 1.5 }}>
+                    <label className="text-sm" style={{ fontWeight: 600, color: "var(--charcoal)" }}>Preferred approach</label>
                     <div className="filter-pills">
                         {MODALITIES.map(mod => (
                             <button
@@ -171,7 +173,7 @@ export default function HealerGrid({ initialHealers }: { initialHealers: Healer[
                     </div>
 
                     <div className="input-group" style={{ minWidth: 160 }}>
-                        <label>Max price: ${maxPrice}/hr</label>
+                        <label className="text-sm" style={{ fontWeight: 600, color: "var(--charcoal)" }}>Max exchange: ${maxPrice}/hr</label>
                         <input
                             type="range"
                             min={30}

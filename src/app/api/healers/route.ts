@@ -40,6 +40,7 @@ export async function GET(req: Request) {
         if (search) {
             const q = search.toLowerCase();
             rows = rows.filter(h =>
+                h.slug.toLowerCase().includes(q) ||
                 h.fullName.toLowerCase().includes(q) ||
                 (h.bio ?? "").toLowerCase().includes(q)
             );

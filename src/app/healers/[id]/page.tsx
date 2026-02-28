@@ -8,10 +8,8 @@ export const dynamic = "force-dynamic";
 
 export default async function HealerProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const [healer, reviews] = await Promise.all([
-        getHealerBySlug(id),
-        getReviewsBySlug(id),
-    ]);
+    const healer = await getHealerBySlug(id);
+    const reviews = await getReviewsBySlug(id);
 
     if (!healer) {
         return (
